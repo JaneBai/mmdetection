@@ -7,7 +7,7 @@ from .builder import ANCHOR_GENERATORS
 
 
 @ANCHOR_GENERATORS.register_module()
-class AnchorGenerator(object):
+class AnchorGenerator:
     """Standard anchor generator for 2D anchor-based detectors.
 
     Args:
@@ -38,8 +38,8 @@ class AnchorGenerator(object):
 
     Examples:
         >>> from mmdet.core import AnchorGenerator
-        >>> self = AnchorGenerator([16], [1.], [1.], [9])
-        >>> all_anchors = self.grid_anchors([(2, 2)], device='cpu')
+        >>> self = AnchorGenerator([16], [1.], [1.], [9]) #byy stride=[(16,16)],下采样16倍; ratio=tensor([1.]),宽高比例为1.0,仅一种; scale=tensor([1.]);base_sizes=[9],anchor的尺寸
+        >>> all_anchors = self.grid_anchors([(2, 2)], device='cpu') #byy 特征图大小为2*2，num_levels为1.生成的anchor个数等于2*2
         >>> print(all_anchors)
         [tensor([[-4.5000, -4.5000,  4.5000,  4.5000],
                 [11.5000, -4.5000, 20.5000,  4.5000],
