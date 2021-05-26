@@ -217,6 +217,27 @@ class AnchorHead(BaseDenseHead, BBoxTestMixin):
         assign_result = self.assigner.assign(
             anchors, gt_bboxes, gt_bboxes_ignore,
             None if self.sampling else gt_labels)
+        ##byy 统计下单张图片的正样本个数
+        # gt_inds = assign_result.gt_inds
+        # index = gt_inds>0
+        # gt_inds = gt_inds(index)
+        # gt_anchors = anchors[index]
+        # self.count_img+=1
+        # self.sum_num_gtanchor+=len(gt_inds)
+        # gt_len = gt_bboxes.shape[0]
+        # self.sum_num_gtbbox += gt_len
+        # print(len(gt_inds),gt_len)
+        # if self.count_img == 50:
+        #     avg_num_gtanchor = self.sum_num_gtanchor / self.count_img
+        #     avg_num_gtbbox = self.sum_num_gtbbox / self.count_img
+        #     print( 'avg_num_gtanchor:', avg_num_gtanchor, 'avg_num_gtbbox:', avg_num_gtbbox)
+        #     filename = 'pos_anchors.txt'     # the number of pos_anchors will be saved in pos_anchors.txt
+        #     with open(filename, 'a') as file_object:
+        #            file_object.write('avg_num_gtanchor:' + str(avg_num_gtanchor) + ' '  + 'avg_num_gtbbox:' +  str(avg_num_gtbbox) + '\n')
+        #     self.count_img = 0
+        #     self.sum_num_gtanchor = 0
+        #     self.sum_num_gtbbox = 0
+        ##byy
         sampling_result = self.sampler.sample(assign_result, anchors,
                                               gt_bboxes)
 

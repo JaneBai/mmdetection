@@ -7,10 +7,10 @@ def wider_face_classes():
 
 def voc_classes():
     return [
-        'aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat',
-        'chair', 'cow', 'diningtable', 'dog', 'horse', 'motorbike', 'person',
-        'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor'
-    ]
+        '1', '2', '3', '4', '5', '6', '7', '8',
+        '9', '10', '11', '12', '13', '14', '15',
+        '16', '17', '18', '19', '20'
+    ]##注意：只有一个类别，需要加上逗号，否则会报错
 
 
 def imagenet_det_classes():

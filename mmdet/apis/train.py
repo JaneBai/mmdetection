@@ -58,7 +58,7 @@ def train_detector(model,
                 'Automatically set "samples_per_gpu"="imgs_per_gpu"='
                 f'{cfg.data.imgs_per_gpu} in this experiments')
         cfg.data.samples_per_gpu = cfg.data.imgs_per_gpu
-
+    #1、构建data_loader
     data_loaders = [
         build_dataloader(
             ds,
@@ -85,6 +85,7 @@ def train_detector(model,
             model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
 
     # build runner
+    #2、构建优化器
     optimizer = build_optimizer(model, cfg.optimizer)
 
     if 'runner' not in cfg:
@@ -98,7 +99,7 @@ def train_detector(model,
     else:
         if 'total_epochs' in cfg:
             assert cfg.total_epochs == cfg.runner.max_epochs
-
+    #3、实例化用于训练的Runner
     runner = build_runner(
         cfg.runner,
         default_args=dict(
@@ -114,14 +115,16 @@ def train_detector(model,
     # fp16 setting
     fp16_cfg = cfg.get('fp16', None)
     if fp16_cfg is not None:
+        #如果我们设置了，则会生成一个Fp16OptimizerHook的实例
         optimizer_config = Fp16OptimizerHook(
             **cfg.optimizer_config, **fp16_cfg, distributed=distributed)
     elif distributed and 'type' not in cfg.optimizer_config:
         optimizer_config = OptimizerHook(**cfg.optimizer_config)
     else:
+        #如果我们没有设置，则正常从config里面读取optimizer_config，如设置grad_clip: optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
         optimizer_config = cfg.optimizer_config
 
-    # register hooks
+    # register hooks 然后注册训练的hooks,optimizer_config会被当参数传进去
     runner.register_training_hooks(cfg.lr_config, optimizer_config,
                                    cfg.checkpoint_config, cfg.log_config,
                                    cfg.get('momentum_config', None))
@@ -130,7 +133,7 @@ def train_detector(model,
             runner.register_hook(DistSamplerSeedHook())
 
     # register eval hooks
-    if validate:
+    if validate:#训练时是否验证？
         # Support batch_size > 1 in validation
         val_samples_per_gpu = cfg.data.val.pop('samples_per_gpu', 1)
         if val_samples_per_gpu > 1:
@@ -162,9 +165,10 @@ def train_detector(model,
             priority = hook_cfg.pop('priority', 'NORMAL')
             hook = build_from_cfg(hook_cfg, HOOKS)
             runner.register_hook(hook, priority=priority)
-
+    # 是否从已训练模型开始训练
     if cfg.resume_from:
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)
+    # 开始训练流程
     runner.run(data_loaders, cfg.workflow)

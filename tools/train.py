@@ -176,6 +176,7 @@ def main():
     # add an attribute for visualization convenience
     model.CLASSES = datasets[0].CLASSES
     #4、将模型，数据集和配置传进训练函数
+    ## cfg配置文件信息，一般都是在config/_base_/，由四个配置文件组成：1）模型配置信息 2）数据集信息 3）训练模式的优化器、学习率、epoch信息 4）设置保存模型的间隔，日志
     train_detector(
         model,
         datasets,
